@@ -12,6 +12,46 @@ Error="${Red_font_prefix}[错误]${Font_color_suffix}"
 Tip="${Green_font_prefix}[提示]${Font_color_suffix}"
 ret_code=`curl -o /dev/null --connect-timeout 3 -s -w %{http_code} https://github.com`
 
+# 检测本机是否为CentOS
+check_sys(){
+    if [[ -f /etc/redhat-release ]]; then
+        release="centos"
+    elif cat /etc/issue | grep -q -E -i "Debian"; then
+        release="debian"
+    elif cat /etc/issue | grep -q -E -i "Ubuntu"; then
+        release="Ubuntu"
+    elif cat /etc/issue | grep -q -E -i "centos|red hat|redhat"; then
+        release="centos"
+    elif cat /proc/version | grep -q -E -i "Debian"; then
+        release="Debian"
+    elif cat /proc/version | grep -q -E -i "Ubuntu"; then
+        release="Ubuntu"
+    elif cat /proc/version | grep -q -E -i "centos|red hat|redhat"; then
+        release="centos"
+    fi
+    bit=`uname -m`
+}
+
+# 如果是CentOS则返回警告
+anti_CentOS(){
+    if [[ ${release} != "centos" ]]; then
+        echo -e "${Error} Amiya官方不推荐使用${release}进行部署，推荐您使用Docker部署!"
+        echo -e "${Info} 本脚本可以运行在${release}上，但未经验证，可能会出现未知错误。"
+        # 继续运行请按Y
+            read -p "是否继续运行？[Y/n]:" yn
+            if [[ $yn == [Yy] ]]; then
+            echo -e "${Info} 继续运行..."
+            else
+            exit 1
+            fi
+    else
+        echo -e "${Info} 检测到当前系统为 [${release} ${bit}]"
+    fi
+
+}
+
+
+
 # 检测本地python版本
 check_python()
 {
@@ -24,6 +64,7 @@ check_python()
         if [ "$python_version" \< "3.6.99" ] || [ "$python_version" \> "3.9.0" ]; then
             echo -e "${Error} 本地python版本为$python_version，不符合要求！"
             echo -e "${Tip} 请安装python3.7或python3.8！"
+            exit 1
         else
             # 尝试安装python
 
@@ -106,6 +147,10 @@ if [ ! -f "Amiya-Bot/amiya.py" ]; then
     echo -e "${Tip} Amiya-Bot下载完成！"
 else
     echo -e "${Info} Amiya-Bot文件已存在，无需安装！"
+    # 更新Amiya-Bot
+    echo -e "${Tip} 正在更新Amiya-Bot..."
+    git pull & waiting
+    echo -e "${Tip} Amiya-Bot更新完成！"
 fi
 }
 
@@ -129,6 +174,7 @@ StartAmiya()
 {
 # 启动Amiya
 echo -e "${Tip} 正在启动Amiya-Bot..." 
+check_sys
 check_python
 check_pip
 pip3 install --upgrade pip
