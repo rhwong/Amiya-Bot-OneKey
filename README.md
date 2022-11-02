@@ -1,6 +1,6 @@
 <div align="center">
 
-# Amiya-Bot-Docker
+# Amiya-Bot-OneKey
 
 用于快速部署基于 [AmiyaBot](https://github.com/AmiyaBot/Amiya-Bot) 框架的 QQ 聊天机器人的Linux快速部署脚本<br>
 
