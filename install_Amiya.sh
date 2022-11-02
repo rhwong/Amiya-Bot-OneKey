@@ -174,6 +174,7 @@ StartAmiya()
 {
 # 启动Amiya
 echo -e "${Tip} 正在启动Amiya-Bot..." 
+mkdir /workspace && cd /workspace
 check_sys
 check_python
 check_pip
