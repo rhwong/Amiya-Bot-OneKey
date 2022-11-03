@@ -85,7 +85,7 @@ anti_bit(){
     if [[ ${bit} == "x86_64" ]]; then
         echo -e "${Info} 系统类型为 ${Green_font_prefix}[${bit}]${Font_color_suffix}，开始安装..."
     else
-        echo -e "${Warrning} Amiya官方不推荐使用${Red_font_prefix}[${bit}]${Font_color_suffix}进行部署，推荐您使用Docker部署!"
+        echo -e "${Warrning} Amiya官方不推荐使用${Red_font_prefix}[${bit}]${Font_color_suffix}进行部署!"
         echo -e "${Warrning} 本脚本可以运行在${Red_font_prefix}[${bit}]${Font_color_suffix}上，但未经验证，可能会出现未知错误。"
         # 继续运行请按Y
             read -p "是否继续运行？[Y/n]:" yn
@@ -125,12 +125,14 @@ check_conda(){
             rm -rf $conda_path
         fi
         echo -e "${Warrning} 注意，在安装中可能会有提示需要你点击enter键或输入yes，请按照屏幕上的提示输入！"
+        sleep 2
         # 按下enter继续
         read -p "按下enter键继续..."
     # conda安装
     # 判断系统是否为Ubuntu
          if [ -x "$(command -v apt)" ]; then
         echo -e "${Tip} 正在尝试安装conda..."
+        sleep 2
         apt install -y wget
         # 下载安装包
             if [[ ${bit} == "x86_64" ]]; then
@@ -178,8 +180,10 @@ check_conda(){
             fi
         bash miniconda.sh
         echo -e "${Info} conda安装结束！"
+        sleep 2
         fi
     add_conda_path
+    source /etc/profile
     check_conda_install
     fi
 }
