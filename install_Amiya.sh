@@ -13,6 +13,7 @@ Warrning="${Red_font_prefix}[警告]${Font_color_suffix}"
 Tip="${Green_font_prefix}[提示]${Font_color_suffix}"
 ret_code=`curl -o /dev/null --connect-timeout 3 -s -w %{http_code} https://google.com`
 conda_path=$HOME/miniconda3
+amiya_path=$HOME/Amiya-Bot
 
 function waiting()
 {
@@ -27,17 +28,6 @@ function waiting()
     done
     let i=i+4
     done
-}
-
-# 检测workspace是否存在，若不存在则创建
-check_workspace(){
-    if [ ! -d "/workspace" ]; then
-        echo -e "${Info} workspace不存在，正在创建..."
-        mkdir /workspace
-        cd /workspace
-    else
-        echo -e "${Info} workspace目录已存在"
-    fi
 }
 
 # 检测本机是否为CentOS
@@ -278,6 +268,7 @@ check_pip()
 # 安装兔兔
 install_Amiya()
 {
+    cd $HOME
     # 判断Amiya-Bot目录下amiya.py是否存在  
 if [ ! -f "Amiya-Bot/amiya.py" ]; then
     echo -e "${Info} Amiya-Bot主文件不存在，开始安装..."
@@ -310,13 +301,15 @@ install_dependence()
 {
     echo -e "${Info} 开始安装或修复依赖..."
     sleep 2
-    cd Amiya-Bot
+    cd $HOME/Amiya-Bot
     if [ $ret_code -eq 200 ]; then
         echo -e "${Info} 网络连通性良好，使用默认镜像下载"
+        pip3 install --upgrade pip
         pip install pyyaml~=6.0 --ignore-installed
         pip3 install --upgrade pip -r requirements.txt
     else
         echo -e "${Info} 网络连通性不佳，使用腾讯镜像下载"
+        pip3 install --upgrade pip -i https://mirrors.cloud.tencent.com/pypi/simple/
         pip install pyyaml~=6.0 --ignore-installed -i https://mirrors.cloud.tencent.com/pypi/simple
         pip3 install --upgrade pip -r requirements.txt -i https://mirrors.cloud.tencent.com/pypi/simple
     fi
@@ -328,7 +321,6 @@ StartAmiya()
 {
 # 启动Amiya
     echo -e "${Tip} 开始安装Amiya-Bot..." 
-    check_workspace
     check_sys
     anti_CentOS
     anti_bit
@@ -341,8 +333,8 @@ install_local(){
     check_python
     check_pip
     install_Amiya
-    chmod -R 766 /workspace
-    cd /workspace/Amiya-Bot
+    chmod -R 766 $HOME/Amiya-Bot
+    cd $HOME/Amiya-Bot
     pip3 install --upgrade pip
     install_dependence
     echo -e "${Tip} Amiya-Bot安装完成！"
@@ -355,15 +347,21 @@ install_local(){
 install_conda(){
     install_wget_git
     check_conda
+    # 判断Amiya环境是否已经存在
+    if [ -d "$conda_path/envs/Amiya" ]; then
+        echo -e "${Info} Amiya环境已存在，跳过部署！"
+    else
+        echo -e "${Info} Amiya环境不存在，开始部署..."
+        conda init bash
+        conda create -n Amiya python=3.8
+        conda activate Amiya
+        echo -e "${Info} Amiya环境部署完成！请重新连接到终端，使用${Green_font_prefix}conda activate Amiya${Font_color_suffix}指令来激活Amiya环境"
+    fi
     echo -e "${Tip} 正在安装Amiya-Bot..."
     sleep 2
-    conda init bash
-    conda create -n Amiya python=3.8
-    conda activate Amiya
     install_Amiya
-    chmod -R 766 /workspace
-    cd /workspace/Amiya-Bot
-    pip3 install --upgrade pip
+    chmod -R 766 $HOME/Amiya-Bot
+    cd $HOME/Amiya-Bot
     install_dependence
     echo -e "${Tip} Amiya-Bot安装完成！"
     sleep 2
@@ -396,8 +394,9 @@ select_install(){
 StartAmiya
 
 # 打印安装位置
-echo -e "${Tip} Amiya-Bot安装位置：/workspace/Amiya-Bot"
+echo -e "${Tip} Amiya-Bot安装位置：$HOME/Amiya-Bot"
 # 打印Amiya启动指令
 echo -e "启动指令如下："
-echo -e "cd /workspace/Amiya-Bot && conda activate Amiya && python3 amiya.py"
+
+echo -e "${Green_font_prefix}cd $HOME/Amiya-Bot && conda activate Amiya && python3 amiya.py${Font_color_suffix}"
 
