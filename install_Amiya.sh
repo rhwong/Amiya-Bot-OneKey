@@ -335,7 +335,6 @@ install_local(){
     install_Amiya
     chmod -R 766 $HOME/Amiya-Bot
     cd $HOME/Amiya-Bot
-    pip3 install --upgrade pip
     install_dependence
     echo -e "${Tip} Amiya-Bot安装完成！"
     sleep 2
