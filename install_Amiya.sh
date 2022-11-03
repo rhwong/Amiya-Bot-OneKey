@@ -11,7 +11,7 @@ Info="${Green_font_prefix}[信息]${Font_color_suffix}"
 Error="${Red_font_prefix}[错误]${Font_color_suffix}"
 Warrning="${Red_font_prefix}[警告]${Font_color_suffix}"
 Tip="${Green_font_prefix}[提示]${Font_color_suffix}"
-ret_code=`curl -o /dev/null --connect-timeout 3 -s -w %{http_code} https://github.com`
+ret_code=`curl -o /dev/null --connect-timeout 3 -s -w %{http_code} https://google.com`
 conda_path=$HOME/miniconda3
 
 function waiting()
@@ -34,6 +34,7 @@ check_workspace(){
     if [ ! -d "/workspace" ]; then
         echo -e "${Info} workspace不存在，正在创建..."
         mkdir /workspace
+        cd /workspace
     else
         echo -e "${Info} workspace目录已存在"
     fi
@@ -394,4 +395,9 @@ select_install(){
 
 StartAmiya
 
+# 打印安装位置
+echo -e "${Tip} Amiya-Bot安装位置：/workspace/Amiya-Bot"
+# 打印Amiya启动指令
+echo -e "启动指令如下："
+echo -e "cd /workspace/Amiya-Bot && conda activate Amiya && python3 amiya.py"
 
