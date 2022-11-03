@@ -2,7 +2,7 @@
 
 # =================================================
 #	Description: Amiya-Bot-OneKey
-#	Version: 1.0.1
+#	Version: 1.0.2
 #	Author: RHWong
 # =================================================
 
@@ -31,12 +31,12 @@ function waiting()
 
 # 检测workspace是否存在，若不存在则创建
 check_workspace(){
-if [ ! -d "/workspace" ]; then
-    echo -e "${Info} workspace不存在，正在创建..."
-    mkdir /workspace
-else
-    echo -e "${Info} workspace目录已存在"
-fi
+    if [ ! -d "/workspace" ]; then
+        echo -e "${Info} workspace不存在，正在创建..."
+        mkdir /workspace
+    else
+        echo -e "${Info} workspace目录已存在"
+    fi
 }
 
 # 检测本机是否为CentOS
