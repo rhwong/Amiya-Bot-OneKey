@@ -309,13 +309,14 @@ install_dependence()
 {
     echo -e "${Info} 开始安装或修复依赖..."
     sleep 2
-    pip install pyyaml~=6.0 --ignore-installed
     cd Amiya-Bot
     if [ $ret_code -eq 200 ]; then
         echo -e "${Info} 网络连通性良好，使用默认镜像下载"
+        pip install pyyaml~=6.0 --ignore-installed
         pip3 install --upgrade pip -r requirements.txt
     else
         echo -e "${Info} 网络连通性不佳，使用腾讯镜像下载"
+        pip install pyyaml~=6.0 --ignore-installed -i https://mirrors.cloud.tencent.com/pypi/simple
         pip3 install --upgrade pip -r requirements.txt -i https://mirrors.cloud.tencent.com/pypi/simple
     fi
     echo -e "${Tip} 依赖安装或修复完成！"
