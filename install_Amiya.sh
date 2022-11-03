@@ -65,10 +65,10 @@ check_sys(){
 # 如果是CentOS则返回警告
 anti_CentOS(){
     if [[ ${release} != "centos" ]]; then
-        echo -e "${Info} 检测到当前系统为 [${release} ${bit}]，开始安装..."
+        echo -e "${Info} 检测到当前发行版系统为 ${Green_font_prefix}[${release}]${Font_color_suffix}..."
     else
-        echo -e "${Warrning} Amiya官方不推荐使用${release}进行部署，推荐您使用Docker部署!"
-        echo -e "${Warrning} 本脚本可以运行在${release}上，但未经验证，可能会出现未知错误。"
+        echo -e "${Warrning} Amiya官方不推荐使用${Red_font_prefix}[${release}]${Font_color_suffix}进行部署，推荐您使用Docker部署!"
+        echo -e "${Warrning} 本脚本可以运行在${Red_font_prefix}[${release}]${Font_color_suffix}上，但未经验证，可能会出现未知错误。"
         # 继续运行请按Y
             read -p "是否继续运行？[Y/n]:" yn
             if [[ $yn == [Yy] ]]; then
@@ -80,7 +80,25 @@ anti_CentOS(){
 
 }
 
-# 判断${release}使用不通方式安装wget和git
+# 如果不是x86_64则返回警告
+anti_bit(){
+    if [[ ${bit} == "x86_64" ]]; then
+        echo -e "${Info} 系统类型为 ${Green_font_prefix}[${bit}]${Font_color_suffix}，开始安装..."
+    else
+        echo -e "${Warrning} Amiya官方不推荐使用${Red_font_prefix}[${bit}]${Font_color_suffix}进行部署，推荐您使用Docker部署!"
+        echo -e "${Warrning} 本脚本可以运行在${Red_font_prefix}[${bit}]${Font_color_suffix}上，但未经验证，可能会出现未知错误。"
+        # 继续运行请按Y
+            read -p "是否继续运行？[Y/n]:" yn
+            if [[ $yn == [Yy] ]]; then
+            echo -e "${Info} 继续运行..."
+            else
+            exit 1
+            fi
+    fi
+
+}
+
+# 判断${release}使用不同方式安装wget和git
 install_wget_git(){
     if [[ ${release} == "centos" ]]; then
         yum install -y wget git
@@ -92,9 +110,6 @@ install_wget_git(){
         sleep 3
     fi
 }
-
-
-
 
 # 检测是否存在conda
 check_conda(){
@@ -117,16 +132,52 @@ check_conda(){
          if [ -x "$(command -v apt)" ]; then
         echo -e "${Tip} 正在尝试安装conda..."
         apt install -y wget
-        wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh
-        bash Miniconda3-latest-Linux-x86_64.sh
-        echo -e "${Info} conda安装完成！"
+        # 下载安装包
+            if [[ ${bit} == "x86_64" ]]; then
+                wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+            elif [[ ${bit} == "aarch64" ]]; then
+                wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-aarch64.sh -O miniconda.sh
+            elif [[ ${bit} == "armv7l" ]]; then
+                wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-armv7l.sh -O miniconda.sh
+            elif [[ ${bit} == "i686" ]]; then
+                wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
+            elif [[ ${bit} == "ppc64le" ]]; then
+                wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-ppc64le.sh -O miniconda.sh
+            elif [[ ${bit} == "s390x" ]]; then
+                wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-s390x.sh -O miniconda.sh
+            elif [[ ${bit} == "i386" ]]; then
+                wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
+            else
+                echo -e "${Error} 本脚本不支持${Red_font_prefix}[${bit}]${Font_color_suffix}系统！"
+                exit 1
+            fi
+        bash miniconda.sh
+        echo -e "${Info} conda安装结束！"
         else
     # 使用yum安装conda
         echo -e "${Tip} 正在尝试使用yum安装conda..."
         yum install -y wget
-        wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh
-        bash Miniconda3-latest-Linux-x86_64.sh
-        echo -e "${Info} conda安装完成！"
+    # 下载安装包
+            if [[ ${bit} == "x86_64" ]]; then
+                wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+            elif [[ ${bit} == "aarch64" ]]; then
+                wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-aarch64.sh -O miniconda.sh
+            elif [[ ${bit} == "armv7l" ]]; then
+                wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-armv7l.sh -O miniconda.sh
+            elif [[ ${bit} == "i686" ]]; then
+                wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
+            elif [[ ${bit} == "ppc64le" ]]; then
+                wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-ppc64le.sh -O miniconda.sh
+            elif [[ ${bit} == "s390x" ]]; then
+                wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-s390x.sh -O miniconda.sh
+            elif [[ ${bit} == "i386" ]]; then
+                wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
+            else
+                echo -e "${Error} 本脚本不支持${Red_font_prefix}[${bit}]${Font_color_suffix}系统！"
+                exit 1
+            fi
+        bash miniconda.sh
+        echo -e "${Info} conda安装结束！"
         fi
     add_conda_path
     check_conda_install
@@ -151,7 +202,6 @@ add_conda_path(){
     source /etc/profile
     echo -e "${Info} conda加入环境变量完成！"
 }
-
 
 # 检测本地python版本
 check_python()
@@ -220,8 +270,7 @@ check_pip()
     fi
 }
 
-
-
+# 安装兔兔
 install_Amiya()
 {
     # 判断Amiya-Bot目录下amiya.py是否存在  
@@ -276,6 +325,7 @@ StartAmiya()
     check_workspace
     check_sys
     anti_CentOS
+    anti_bit
     select_install
 }
 
