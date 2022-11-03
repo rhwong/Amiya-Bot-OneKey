@@ -340,6 +340,11 @@ install_local(){
     sleep 2
     echo -e "${Tip} 开始尝试运行，如有问题请提交issue"
     python3 amiya.py
+    # 打印安装位置
+    echo -e "${Tip} Amiya-Bot安装位置：$HOME/Amiya-Bot"
+    # 打印Amiya启动指令
+    echo -e "启动指令如下："
+    echo -e "${Green_font_prefix}cd $HOME/Amiya-Bot && python3 amiya.py${Font_color_suffix}"
 }
 
 # conda安装
@@ -366,6 +371,11 @@ install_conda(){
     sleep 2
     echo -e "${Tip} 开始尝试运行，如有问题请提交issue"
     python3 amiya.py
+    # 打印安装位置
+    echo -e "${Tip} Amiya-Bot安装位置：$HOME/Amiya-Bot"
+#    打印Amiya启动指令
+    echo -e "启动指令如下："
+    echo -e "${Green_font_prefix}cd $HOME/Amiya-Bot && conda activate Amiya && python3 amiya.py${Font_color_suffix}"
 }
 
 
@@ -392,10 +402,5 @@ select_install(){
 
 StartAmiya
 
-# 打印安装位置
-echo -e "${Tip} Amiya-Bot安装位置：$HOME/Amiya-Bot"
-# 打印Amiya启动指令
-echo -e "启动指令如下："
 
-echo -e "${Green_font_prefix}cd $HOME/Amiya-Bot && conda activate Amiya && python3 amiya.py${Font_color_suffix}"
 
