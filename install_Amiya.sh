@@ -13,7 +13,6 @@ Warrning="${Red_font_prefix}[警告]${Font_color_suffix}"
 Tip="${Green_font_prefix}[提示]${Font_color_suffix}"
 ret_code=`curl -o /dev/null --connect-timeout 3 -s -w %{http_code} https://google.com`
 conda_path=$HOME/miniconda3
-amiya_path=$HOME/Amiya-Bot
 
 function waiting()
 {
@@ -148,7 +147,7 @@ check_conda(){
         echo -e "${Info} conda安装结束！"
         else
     # 使用yum安装conda
-        echo -e "${Tip} 正在尝试使用yum安装conda..."
+        echo -e "${Tip} 正在尝试安装conda..."
         yum install -y wget
     # 下载安装包
             if [[ ${bit} == "x86_64" ]]; then
@@ -360,6 +359,7 @@ install_conda(){
         conda create -n Amiya python=3.8
         conda activate Amiya
         echo -e "${Info} Amiya环境部署完成！请重新连接到终端，使用${Green_font_prefix}conda activate Amiya${Font_color_suffix}指令来激活Amiya环境"
+        exit 1
     fi
     echo -e "${Tip} 正在安装Amiya-Bot..."
     sleep 2
