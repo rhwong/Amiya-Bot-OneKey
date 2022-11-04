@@ -175,6 +175,8 @@ check_conda(){
     add_conda_path
     source /etc/profile
     check_conda_install
+    echo -e "${Warrning}请重新连接到终端，再次运行本脚本以继续安装。"
+    exit 1
     fi
 }
 
@@ -358,8 +360,7 @@ install_conda(){
         conda init bash
         conda create -n Amiya python=3.8
         conda activate Amiya
-        echo -e "${Info} Amiya环境部署完成！请重新连接到终端，使用${Green_font_prefix}conda activate Amiya${Font_color_suffix}指令来激活Amiya环境"
-        exit 1
+        echo -e "${Info} Amiya环境部署完成！"
     fi
     echo -e "${Tip} 正在安装Amiya-Bot..."
     sleep 2
