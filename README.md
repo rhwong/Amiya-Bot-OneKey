@@ -16,7 +16,7 @@
 ### 安装
 
 ```shell
-wget -N https://github.com/rhwong/Amiya-Bot-OneKey/raw/main/install_Amiya.sh
+wget -N https://ghproxy.com/https://github.com/rhwong/Amiya-Bot-OneKey/raw/main/install_Amiya.sh
 chmod -R 755 install_Amiya.sh
 ./install_Amiya.sh
 ```
