@@ -16,7 +16,8 @@
 ### 安装
 
 ```shell
-wget -N https://github.com/rhwong/Amiya-Bot-OneKey/raw/main/install_Amiya.sh && chmod -R 755 install_Amiya.sh && ./install_Amiya.sh
+wget -N https://github.com/rhwong/Amiya-Bot-OneKey/raw/main/install_Amiya.sh && chmod -R 755 install_Amiya.sh
+./install_Amiya.sh
 ```
 注意：由于conda在加入环境变量后必须重新连接到终端以生效，第一次退出脚本后请务必断开ssh，重新连接ssh终端。
 
