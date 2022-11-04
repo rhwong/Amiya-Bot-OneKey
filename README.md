@@ -19,7 +19,7 @@
 wget -N https://github.com/rhwong/Amiya-Bot-OneKey/raw/main/install_Amiya.sh && chmod -R 755 install_Amiya.sh
 ./install_Amiya.sh
 ```
-【注意事项】
+#### 【注意事项】
 
 1.在Conda安装时需要键入一些确认指令，当屏幕上提示按 `Enter` 时请按下，当提示是否确认时，请输入 `yes` 。许可部分可以按 `Q` 跳过阅读。
 
