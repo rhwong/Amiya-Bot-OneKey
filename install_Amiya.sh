@@ -93,15 +93,106 @@
         if [[ ${release} == "centos" ]]; then
             yum install -y wget git
         elif [[ ${release} == "debian" || ${release} == "Ubuntu" ]]; then
-            apt-get update
-            apt-get install -y wget git
+            sudo apt-get update
+            sudo apt-get install -y wget git
         elif [[ ${release} == "unknown" ]]; then
             echo -e "${Error} 未知系统版本，若无法继续运行请自行安装wget和git"
             sleep 3
         fi
     }
 
-    # 检测是否存在conda
+    # 打印release和bit
+        # 如果是CentOS则返回警告
+    print_release_bit(){
+        if [[ ${release} != "centos" ]]; then
+            echo -e "${Info} 当前系统为 ${Green_font_prefix}[${release}]${Font_color_suffix} ${Green_font_prefix}[${bit}]${Font_color_suffix}"
+        else
+            echo -e "${Info} 当前系统为 ${Green_font_prefix}[${release}]${Font_color_suffix} ${Green_font_prefix}[${bit}]${Font_color_suffix}"
+            echo -e "${Warrning} Amiya官方不推荐使用${Red_font_prefix}[${release}]${Font_color_suffix}进行部署，推荐您使用Docker部署!"
+            echo -e "${Warrning} 本脚本可以运行在${Red_font_prefix}[${release}]${Font_color_suffix}上，但未经验证，可能会出现未知错误。"
+            sleep 5
+        fi
+
+    }
+
+    # 静默安装conda
+    silent_install_conda(){
+        # conda命令可用，跳过安装
+        if [ -x "$(command -v conda)" ]; then
+            echo -e "${Info} 检测到已存在conda，跳过安装"
+            sleep 2
+        else
+            echo -e "${Info} 检测到未安装conda，开始安装"
+            # 删除conda目录
+            if [ -d "$conda_path" ]; then
+                echo -e "${Info} 检测到已存在conda目录，正在删除..."
+                rm -rf $conda_path
+            fi
+            echo -e "${Warrning} 注意，安装中如果提示需要你点击enter键或输入yes，请按照屏幕上的提示输入！"
+            echo -e "${Warrning} 安装conda完毕后，请重新连接终端并切换到amiya环境后重新运行此脚本。"
+            sleep 5
+        # conda安装
+        # 判断系统是否为Ubuntu
+            if [ -x "$(command -v apt)" ]; then
+            echo -e "${Tip} 开始尝试安装conda..."
+            sleep 2
+            sudo apt-get install -y wget
+            # 下载安装包
+                if [[ ${bit} == "x86_64" ]]; then
+                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+                elif [[ ${bit} == "aarch64" ]]; then
+                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-aarch64.sh -O miniconda.sh
+                elif [[ ${bit} == "armv7l" ]]; then
+                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-armv7l.sh -O miniconda.sh
+                elif [[ ${bit} == "i686" ]]; then
+                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
+                elif [[ ${bit} == "ppc64le" ]]; then
+                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-ppc64le.sh -O miniconda.sh
+                elif [[ ${bit} == "s390x" ]]; then
+                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-s390x.sh -O miniconda.sh
+                elif [[ ${bit} == "i386" ]]; then
+                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
+                else
+                    echo -e "${Error} 本脚本不支持${Red_font_prefix}[${bit}]${Font_color_suffix}系统！"
+                    exit 1
+                fi
+            bash miniconda.sh -b
+            echo -e "${Info} conda安装结束！"
+            else
+        # 使用yum安装conda
+            echo -e "${Tip} 正在尝试安装conda..."
+            yum install -y wget
+        # 下载安装包
+                if [[ ${bit} == "x86_64" ]]; then
+                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+                elif [[ ${bit} == "aarch64" ]]; then
+                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-aarch64.sh -O miniconda.sh
+                elif [[ ${bit} == "armv7l" ]]; then
+                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-armv7l.sh -O miniconda.sh
+                elif [[ ${bit} == "i686" ]]; then
+                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
+                elif [[ ${bit} == "ppc64le" ]]; then
+                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-ppc64le.sh -O miniconda.sh
+                elif [[ ${bit} == "s390x" ]]; then
+                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-s390x.sh -O miniconda.sh
+                elif [[ ${bit} == "i386" ]]; then
+                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
+                else
+                    echo -e "${Error} 本脚本不支持${Red_font_prefix}[${bit}]${Font_color_suffix}系统！"
+                    exit 1
+                fi
+            bash miniconda.sh -b
+            echo -e "${Info} conda安装结束！"
+            sleep 2
+            fi
+        add_conda_path
+        source /etc/profile
+        check_conda_install
+        fi
+    }
+
+
+    # 安装conda
     check_conda(){
         # conda命令可用，跳过安装
         if [ -x "$(command -v conda)" ]; then
@@ -124,7 +215,7 @@
             if [ -x "$(command -v apt)" ]; then
             echo -e "${Tip} 开始尝试安装conda..."
             sleep 2
-            apt install -y wget
+            sudo apt-get install -y wget
             # 下载安装包
                 if [[ ${bit} == "x86_64" ]]; then
                     wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
@@ -198,6 +289,20 @@
         echo -e "${Info} conda加入环境变量完成！"
     }
 
+    create_conda_env(){
+        # 判断Amiya环境是否已经存在
+        if [ -d "$conda_path/envs/Amiya" ]; then
+            echo -e "${Info} Amiya环境已存在，跳过部署！"
+        else
+            echo -e "${Info} Amiya环境不存在，开始部署..."
+            conda init bash
+            echo y | conda create -n Amiya python=3.8
+            conda activate Amiya
+            echo -e "${Info} Amiya环境部署完成！请${Red_font_prefix}重新连接${Font_color_suffix}到终端，使用${Green_font_prefix}conda activate Amiya${Font_color_suffix}指令来激活Amiya环境，然后${Red_font_prefix}重新运行${Font_color_suffix}此脚本。"
+            exit 1
+        fi
+    }
+
     # 检测本地python版本
     check_python()
     {
@@ -218,7 +323,7 @@
                 # 判断系统是否为Ubuntu
                 if [ -x "$(command -v apt)" ]; then
                     echo -e "${Tip} 正在尝试安装python3.8..."
-                    apt install -y python3.8
+                    sudo apt-get install -y python3.8
                 else
                 # 使用yum安装python3.8
                     echo -e "${Tip} 正在尝试使用yum安装python3.8..."
@@ -247,7 +352,7 @@
             sleep 2
                 # 判断系统是否为Ubuntu
                 if [ -x "$(command -v apt)" ]; then
-                    apt install -y python3-pip
+                    sudo apt-get install -y python3-pip
                     echo -e "${Info} pip安装完成！"
                 else
                 # 使用yum安装pip
@@ -351,17 +456,31 @@
     install_conda(){
         install_wget_git
         check_conda
-        # 判断Amiya环境是否已经存在
-        if [ -d "$conda_path/envs/Amiya" ]; then
-            echo -e "${Info} Amiya环境已存在，跳过部署！"
-        else
-            echo -e "${Info} Amiya环境不存在，开始部署..."
-            conda init bash
-            echo y | conda create -n Amiya python=3.8
-            conda activate Amiya
-            echo -e "${Info} Amiya环境部署完成！请${Red_font_prefix}重新连接${Font_color_suffix}到终端，使用${Green_font_prefix}conda activate Amiya${Font_color_suffix}指令来激活Amiya环境，然后${Red_font_prefix}重新运行${Font_color_suffix}此脚本。"
-            exit 1
-        fi
+        create_conda_env
+        echo -e "${Tip} 正在安装Amiya-Bot..."
+        sleep 2
+        install_Amiya
+        chmod -R 766 $HOME/Amiya-Bot
+        cd $HOME/Amiya-Bot
+        install_dependence
+        echo -e "${Tip} Amiya-Bot安装完成！"
+        sleep 2
+        echo -e "${Tip} 开始尝试运行，如有问题请提交issue"
+        python3 amiya.py
+        # 打印安装位置
+        echo -e "${Tip} Amiya-Bot安装位置：$HOME/Amiya-Bot"
+    #    打印Amiya启动指令
+        echo -e "启动指令如下："
+        echo -e "${Green_font_prefix}cd $HOME/Amiya-Bot && conda activate Amiya && python3 amiya.py${Font_color_suffix}"
+    }
+
+    # 静默conda安装
+    silent_start(){
+        check_sys
+        print_release_bit
+        install_wget_git
+        silent_install_conda
+        create_conda_env
         echo -e "${Tip} 正在安装Amiya-Bot..."
         sleep 2
         install_Amiya
@@ -400,4 +519,11 @@
         esac
     }
 
-    StartAmiya
+
+
+# 判断脚本运行时是否包含-s参数，如果有则跳过确认步骤
+    if [[ $1 == "-s" ]]; then
+        silent_start
+    else
+        StartAmiya
+    fi
