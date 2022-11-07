@@ -114,14 +114,15 @@
                 echo -e "${Info} 检测到已存在conda目录，正在删除..."
                 rm -rf $conda_path
             fi
-            echo -e "${Warrning} 注意，在安装中可能会有提示需要你点击enter键或输入yes，请按照屏幕上的提示输入！"
+            echo -e "${Warrning} 注意，安装中如果提示需要你点击enter键或输入yes，请按照屏幕上的提示输入！"
+            echo -e "${Warrning} 安装conda完毕后，请重新连接终端并切换到amiya环境后重新运行此脚本。"
             sleep 2
             # 按下enter继续
-            read -p "按下enter键继续..."
+            read -p "确认阅读上述说明后，按下enter键继续..."
         # conda安装
         # 判断系统是否为Ubuntu
             if [ -x "$(command -v apt)" ]; then
-            echo -e "${Tip} 正在尝试安装conda..."
+            echo -e "${Tip} 开始尝试安装conda..."
             sleep 2
             apt install -y wget
             # 下载安装包
