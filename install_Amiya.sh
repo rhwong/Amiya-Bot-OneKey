@@ -168,7 +168,7 @@ check_conda(){
                 echo -e "${Error} 本脚本不支持${Red_font_prefix}[${bit}]${Font_color_suffix}系统！"
                 exit 1
             fi
-        bash miniconda.sh
+        bash ~/miniconda.sh -b -p $HOME/miniconda
         echo -e "${Info} conda安装结束！"
         sleep 2
         fi
