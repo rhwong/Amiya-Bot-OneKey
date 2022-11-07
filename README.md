@@ -40,7 +40,6 @@ conda activate Amiya
 依次输入如下指令来启动Amiya-Bot，此后也如此。
 
 ```shell
-screen -dmS Amiya
 conda activate Amiya
 cd $HOME/Amiya-Bot
 python3 amiya.py
