@@ -358,7 +358,7 @@ install_conda(){
         conda init bash
         conda create -n Amiya python=3.8
         conda activate Amiya
-        echo -e "${Info} Amiya环境部署完成！请重新连接到终端，使用${Green_font_prefix}conda activate Amiya${Font_color_suffix}指令来激活Amiya环境"
+        echo -e "${Info} Amiya环境部署完成！请${Red_font_prefix}重新连接${Font_color_suffix}到终端，使用${Green_font_prefix}conda activate Amiya${Font_color_suffix}指令来激活Amiya环境，然后${Red_font_prefix}重新运行${Font_color_suffix}此脚本。"
         exit 1
     fi
     echo -e "${Tip} 正在安装Amiya-Bot..."
@@ -399,8 +399,4 @@ select_install(){
     esac
 }
 
-
 StartAmiya
-
-
-
