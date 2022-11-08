@@ -13,7 +13,7 @@
 注意：本脚本仅在以下发行版经过测试
 
 <img src="https://img.shields.io/badge/Ubuntu-x86__64-red?style=flat-square&logo=ubuntu"> 
-<img src="https://img.shields.io/badge/CentOS-x86__64-red?style=flat-square&logo=centos">
+<img src="https://img.shields.io/badge/CentOS-x86__64-green?style=flat-square&logo=centos">
 
 其他发行版及类型系统如果出现问题请提交issue！
 
