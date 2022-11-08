@@ -271,12 +271,13 @@
                 exit 1
         # 如果版本大于3.9
             elif [ "$python_version" \> "3.9.0" ]; then
-                echo -e "${Error} 本地python版本为$python_version，大于3.8可能会出现依赖版本不支持的情况！"
+                echo -e "${Warrning} 本地python版本为$python_version，大于3.8可能会出现依赖版本不支持的情况！"
                 # 询问是否继续，输入y继续，输入n退出
                 read -p "是否继续？[y/n]:" yn
                 if [[ $yn == [Yy] ]]; then
                 echo -e "${Info} 继续运行..."
                 else
+                echo -e "${Info} 退出运行！"
                 exit 1
                 fi
             else
