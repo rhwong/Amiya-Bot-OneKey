@@ -29,22 +29,22 @@
         done
     }
 
-    # 检测本机是否为CentOS
+    # 检测本机是否为Centos
     check_sys(){
         if [[ -f /etc/redhat-release ]]; then
-            release="centos"
+            release="Centos"
         elif cat /etc/issue | grep -q -E -i "Debian"; then
-            release="debian"
+            release="Debian"
         elif cat /etc/issue | grep -q -E -i "Ubuntu"; then
             release="Ubuntu"
-        elif cat /etc/issue | grep -q -E -i "centos|red hat|redhat"; then
-            release="centos"
+        elif cat /etc/issue | grep -q -E -i "Centos|red hat|redhat"; then
+            release="Centos"
         elif cat /proc/version | grep -q -E -i "Debian"; then
             release="Debian"
         elif cat /proc/version | grep -q -E -i "Ubuntu"; then
             release="Ubuntu"
-        elif cat /proc/version | grep -q -E -i "centos|red hat|redhat"; then
-            release="centos"
+        elif cat /proc/version | grep -q -E -i "Centos|red hat|redhat"; then
+            release="Centos"
         # 如果是未知系统版本则输出unknown
         else
             release="unknown"
@@ -52,9 +52,9 @@
         bit=`uname -m`
     }
 
-    # 如果是CentOS则返回警告
-    anti_CentOS(){
-        if [[ ${release} != "centos" ]]; then
+    # 如果是Centos则返回警告
+    anti_Centos(){
+        if [[ ${release} != "Centos" ]]; then
             echo -e "${Info} 检测到当前发行版系统为 ${Green_font_prefix}[${release}]${Font_color_suffix}..."
         else
             echo -e "${Warrning} Amiya官方不推荐使用${Red_font_prefix}[${release}]${Font_color_suffix}进行部署，推荐您使用Docker部署!"
@@ -90,11 +90,14 @@
 
     # 判断${release}使用不同方式安装wget和git
     install_wget_git(){
-        if [[ ${release} == "centos" ]]; then
+        if [[ ${release} == "Centos" ]]; then
             yum install -y wget git
-        elif [[ ${release} == "debian" || ${release} == "Ubuntu" ]]; then
-            sudo apt-get update
-            sudo apt-get install -y wget git
+        elif [[ ${release} == "Ubuntu" ]]; then
+            sudo apt update
+            sudo apt install -y wget git
+        elif [[ ${release} == "Debian" ]]; then
+            apt update
+            apt install -y wget git
         elif [[ ${release} == "unknown" ]]; then
             echo -e "${Error} 未知系统版本，若无法继续运行请自行安装wget和git"
             sleep 3
@@ -102,9 +105,9 @@
     }
 
     # 打印release和bit
-        # 如果是CentOS则返回警告
+        # 如果是Centos则返回警告
     print_release_bit(){
-        if [[ ${release} != "centos" ]]; then
+        if [[ ${release} != "Centos" ]]; then
             echo -e "${Info} 当前系统为 ${Green_font_prefix}[${release}]${Font_color_suffix} ${Green_font_prefix}[${bit}]${Font_color_suffix}"
         else
             echo -e "${Info} 当前系统为 ${Green_font_prefix}[${release}]${Font_color_suffix} ${Green_font_prefix}[${bit}]${Font_color_suffix}"
@@ -130,13 +133,8 @@
             fi
             echo -e "${Warrning} 注意，安装中如果提示需要你点击enter键或输入yes，请按照屏幕上的提示输入！"
             echo -e "${Warrning} 安装conda完毕后，请重新连接终端并切换到amiya环境后重新运行此脚本。"
-            sleep 5
+            sleep 4
         # conda安装
-        # 判断系统是否为Ubuntu
-            if [ -x "$(command -v apt)" ]; then
-            echo -e "${Tip} 开始尝试安装conda..."
-            sleep 2
-            sudo apt-get install -y wget
             # 下载安装包
                 if [[ ${bit} == "x86_64" ]]; then
                     wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
@@ -158,33 +156,7 @@
                 fi
             bash miniconda.sh -b
             echo -e "${Info} conda安装结束！"
-            else
-        # 使用yum安装conda
-            echo -e "${Tip} 正在尝试安装conda..."
-            yum install -y wget
-        # 下载安装包
-                if [[ ${bit} == "x86_64" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-                elif [[ ${bit} == "aarch64" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-aarch64.sh -O miniconda.sh
-                elif [[ ${bit} == "armv7l" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-armv7l.sh -O miniconda.sh
-                elif [[ ${bit} == "i686" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
-                elif [[ ${bit} == "ppc64le" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-ppc64le.sh -O miniconda.sh
-                elif [[ ${bit} == "s390x" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-s390x.sh -O miniconda.sh
-                elif [[ ${bit} == "i386" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
-                else
-                    echo -e "${Error} 本脚本不支持${Red_font_prefix}[${bit}]${Font_color_suffix}系统！"
-                    exit 1
-                fi
-            bash miniconda.sh -b
-            echo -e "${Info} conda安装结束！"
             sleep 2
-            fi
         add_conda_path
         source /etc/profile
         check_conda_install
@@ -211,11 +183,6 @@
             # 按下enter继续
             read -p "确认阅读上述说明后，按下enter键继续..."
         # conda安装
-        # 判断系统是否为Ubuntu
-            if [ -x "$(command -v apt)" ]; then
-            echo -e "${Tip} 开始尝试安装conda..."
-            sleep 2
-            sudo apt-get install -y wget
             # 下载安装包
                 if [[ ${bit} == "x86_64" ]]; then
                     wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
@@ -237,33 +204,7 @@
                 fi
             bash miniconda.sh -b
             echo -e "${Info} conda安装结束！"
-            else
-        # 使用yum安装conda
-            echo -e "${Tip} 正在尝试安装conda..."
-            yum install -y wget
-        # 下载安装包
-                if [[ ${bit} == "x86_64" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-                elif [[ ${bit} == "aarch64" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-aarch64.sh -O miniconda.sh
-                elif [[ ${bit} == "armv7l" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-armv7l.sh -O miniconda.sh
-                elif [[ ${bit} == "i686" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
-                elif [[ ${bit} == "ppc64le" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-ppc64le.sh -O miniconda.sh
-                elif [[ ${bit} == "s390x" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-s390x.sh -O miniconda.sh
-                elif [[ ${bit} == "i386" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
-                else
-                    echo -e "${Error} 本脚本不支持${Red_font_prefix}[${bit}]${Font_color_suffix}系统！"
-                    exit 1
-                fi
-            bash miniconda.sh -b
-            echo -e "${Info} conda安装结束！"
             sleep 2
-            fi
         add_conda_path
         source /etc/profile
         check_conda_install
@@ -293,8 +234,10 @@
         # 判断Amiya环境是否已经存在
         if [ -d "$conda_path/envs/Amiya" ]; then
             echo -e "${Info} Amiya环境已存在，跳过部署！"
+            sleep 2
         else
             echo -e "${Info} Amiya环境不存在，开始部署..."
+            sleep 2
             conda init bash
             echo y | conda create -n Amiya python=3.8
             conda activate Amiya
@@ -313,27 +256,26 @@
             sleep 2
         else
         # 如果版本小于3.7，大于3.9
-            if [ "$python_version" \< "3.6.99" ] || [ "$python_version" \> "3.9.0" ]; then
-                echo -e "${Error} 本地python版本为$python_version，不符合要求！"
-                echo -e "${Tip} 请安装python3.7或python3.8！"
+            if [ "$python_version" \< "3.6.99" ]; then
+                echo -e "${Error} 本地python版本为$python_version，版本过低不符合要求！"
+                echo -e "${Tip} 请手动安装python3.7或python3.8，或重新运行脚本安装conda"
                 exit 1
-            else
-                # 尝试安装python
-
-                # 判断系统是否为Ubuntu
-                if [ -x "$(command -v apt)" ]; then
-                    echo -e "${Tip} 正在尝试安装python3.8..."
-                    sudo apt-get install -y python3.8
+        # 如果版本大于3.9
+            elif [ "$python_version" \> "3.9.0" ]; then
+                echo -e "${Error} 本地python版本为$python_version，大于3.8可能会出现依赖版本不支持的情况！"
+                # 询问是否继续，输入y继续，输入n退出
+                read -p "是否继续？[y/n]:" yn
+                if [[ $yn == [Yy] ]]; then
+                echo -e "${Info} 继续运行..."
                 else
-                # 使用yum安装python3.8
-                    echo -e "${Tip} 正在尝试使用yum安装python3.8..."
-                    yum install -y python3.8
+                exit 1
                 fi
-                echo -e "${Info} python3.8安装完成！"
-                sleep 2
-                
+            else
+            # 没有python
+                echo -e "${Error} 本地没有安装python！"
+                echo -e "${Tip} 请先手动安装python3.7或python3.8，或重新运行脚本使用conda安装"
+                exit 1
             fi
-
         fi
     }
 
@@ -350,15 +292,21 @@
             # 尝试安装pip 
             echo -e "${Tip} 正在尝试安装pip..."
             sleep 2
-                # 判断系统是否为Ubuntu
-                if [ -x "$(command -v apt)" ]; then
-                    sudo apt-get install -y python3-pip
-                    echo -e "${Info} pip安装完成！"
-                else
-                # 使用yum安装pip
+                # 尝试安装python
+                echo -e "${Tip} 正在尝试使用yum安装pip3..."
+                if [[ ${release} == "Centos" ]]; then
                     yum install -y python3-pip
-                    echo -e "${Info} pip安装完成！"
+                elif [[ ${release} == "Ubuntu" ]]; then
+                    sudo apt install -y python3-pip
+                elif [[ ${release} == "Debian" ]]; then
+                    apt install -y python3-pip
+                elif [[ ${release} == "unknown" ]]; then
+                    echo -e "${Error} 未知系统版本，请自行安装pip3！"
+                    sleep 3
+                    exit 1
                 fi
+                echo -e "${Info} pip3安装结束！"
+                sleep 2
 
             if [ -x "$(command -v pip3)" ]; then
                 echo -e "${Info} pip安装成功！"
@@ -427,7 +375,7 @@
     # 启动Amiya
         echo -e "${Tip} 开始安装Amiya-Bot..." 
         check_sys
-        anti_CentOS
+        anti_Centos
         anti_bit
         select_install
     }
@@ -502,15 +450,15 @@
     # 提示选择在本地安装还是在conda安装
     select_install(){
         echo -e "${Info} 请选择安装方式"
-        echo -e "1. 本地安装"
-        echo -e "2. conda虚拟环境安装(推荐)"
+        echo -e "1. conda虚拟环境安装(推荐)"
+        echo -e "2. 本地安装"
         read -p "请输入数字:" num
         case "$num" in
             1)
-            install_local
+            install_conda
             ;;
             2)
-            install_conda
+            install_local
             ;;
             *)
             echo -e "${Error} 请输入正确的数字"
