@@ -17,7 +17,7 @@
 <img src="https://img.shields.io/badge/CentOS-x86__64-green?style=flat-square&logo=centos"> 
 <img src="https://img.shields.io/badge/Debian-x86__64-purple?style=flat-square&logo=debian"> 
 
-其他发行版及类型系统如果出现问题请提交issue！
+其他发行版及类型系统如果测试通过或出现问题请提交issue！
 
 </div>
 <!-- projectInfo end -->
