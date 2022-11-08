@@ -2,7 +2,7 @@
 
     # =================================================
     #	Description: Amiya-Bot-OneKey
-    #	Version: 1.0.3
+    #	Version: 1.1.0
     #	Author: RHWong
     # =================================================
 
@@ -13,6 +13,15 @@
     Tip="${Green_font_prefix}[提示]${Font_color_suffix}"
     ret_code=`curl -o /dev/null --connect-timeout 3 -s -w %{http_code} https://google.com`
     conda_path=$HOME/miniconda3
+    # 如果ret_code变量值是200或者301
+    if [ $ret_code -eq 200 ] || [ $ret_code -eq 301 ]; then
+        miniconda_url=https://repo.anaconda.com/miniconda
+    else
+        miniconda_url=https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda
+    fi
+            
+
+
 
     function waiting()
     {
@@ -137,19 +146,19 @@
         # conda安装
             # 下载安装包
                 if [[ ${bit} == "x86_64" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+                    wget ${miniconda_url}/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
                 elif [[ ${bit} == "aarch64" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-aarch64.sh -O miniconda.sh
+                    wget ${miniconda_url}/Miniconda3-latest-Linux-aarch64.sh -O miniconda.sh
                 elif [[ ${bit} == "armv7l" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-armv7l.sh -O miniconda.sh
+                    wget ${miniconda_url}/Miniconda3-latest-Linux-armv7l.sh -O miniconda.sh
                 elif [[ ${bit} == "i686" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
+                    wget ${miniconda_url}/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
                 elif [[ ${bit} == "ppc64le" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-ppc64le.sh -O miniconda.sh
+                    wget ${miniconda_url}/Miniconda3-latest-Linux-ppc64le.sh -O miniconda.sh
                 elif [[ ${bit} == "s390x" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-s390x.sh -O miniconda.sh
+                    wget ${miniconda_url}/Miniconda3-latest-Linux-s390x.sh -O miniconda.sh
                 elif [[ ${bit} == "i386" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
+                    wget ${miniconda_url}/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
                 else
                     echo -e "${Error} 本脚本不支持${Red_font_prefix}[${bit}]${Font_color_suffix}系统！"
                     exit 1
@@ -185,19 +194,19 @@
         # conda安装
             # 下载安装包
                 if [[ ${bit} == "x86_64" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+                    wget ${miniconda_url}/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
                 elif [[ ${bit} == "aarch64" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-aarch64.sh -O miniconda.sh
+                    wget ${miniconda_url}/Miniconda3-latest-Linux-aarch64.sh -O miniconda.sh
                 elif [[ ${bit} == "armv7l" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-armv7l.sh -O miniconda.sh
+                    wget ${miniconda_url}/Miniconda3-latest-Linux-armv7l.sh -O miniconda.sh
                 elif [[ ${bit} == "i686" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
+                    wget ${miniconda_url}/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
                 elif [[ ${bit} == "ppc64le" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-ppc64le.sh -O miniconda.sh
+                    wget ${miniconda_url}/Miniconda3-latest-Linux-ppc64le.sh -O miniconda.sh
                 elif [[ ${bit} == "s390x" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-s390x.sh -O miniconda.sh
+                    wget ${miniconda_url}/Miniconda3-latest-Linux-s390x.sh -O miniconda.sh
                 elif [[ ${bit} == "i386" ]]; then
-                    wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
+                    wget ${miniconda_url}/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
                 else
                     echo -e "${Error} 本脚本不支持${Red_font_prefix}[${bit}]${Font_color_suffix}系统！"
                     exit 1
@@ -327,7 +336,7 @@
         echo -e "${Info} Amiya-Bot主文件不存在，开始安装..."
         sleep 2
         # 如果ret_code变量值是200
-        if [ $ret_code -eq 200]; then
+        if [ $ret_code -eq 200 ] || [ $ret_code -eq 301 ]; then
             echo -e "${Info} 网络连接正常，开始下载Amiya-Bot..."
             git clone https://github.com/AmiyaBot/Amiya-Bot.git & waiting
         else 
@@ -355,7 +364,7 @@
         echo -e "${Info} 开始安装或修复依赖..."
         sleep 2
         cd $HOME/Amiya-Bot
-        if [ $ret_code -eq 200 ]; then
+        if [ $ret_code -eq 200 ] || [ $ret_code -eq 301 ]; then
             echo -e "${Info} 网络连通性良好，使用默认镜像下载"
             pip3 install --upgrade pip
             pip install pyyaml~=6.0 --ignore-installed
