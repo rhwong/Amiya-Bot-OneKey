@@ -6,7 +6,7 @@
 
 
 <img src="https://img.shields.io/github/issues/rhwong/Amiya-Bot-OneKey"> <img src="https://img.shields.io/github/forks/rhwong/Amiya-Bot-OneKey"> 
-<!--<img src="https://img.shields.io/github/stars/rhwong/Amiya-Bot-OneKey"> <img src="https://img.shields.io/github/license/rhwong/Amiya-Bot-OneKey">-->
+<img src="https://img.shields.io/github/stars/rhwong/Amiya-Bot-OneKey"> <img src="https://img.shields.io/github/license/rhwong/Amiya-Bot-OneKey">
 
 注意：本项目仅用于快速部署 [AmiyaBot](https://github.com/AmiyaBot/Amiya-Bot) 本体，后续对接何种前端(如[Go-cqhtp](https://github.com/Mrs4s/go-cqhttp/))取决您自己的选择，这些部分并不包含在部署范围内，请参考[官方教程](https://www.amiyabot.com/guide/deploy/console/configure.html)。
 
@@ -14,8 +14,8 @@
 
 <img src="https://img.shields.io/badge/Ubuntu-x86__64-red?style=flat-square&logo=ubuntu"> 
 <img src="https://img.shields.io/badge/Ubuntu-aarch64-red?style=flat-square&logo=ubuntu"> 
-<img src="https://img.shields.io/badge/CentOS-x86__64-green?style=flat-square&logo=centos"> 
-<img src="https://img.shields.io/badge/Debian-x86__64-purple?style=flat-square&logo=debian"> 
+<!--<img src="https://img.shields.io/badge/CentOS-x86__64-green?style=flat-square&logo=centos"> 
+<img src="https://img.shields.io/badge/Debian-x86__64-purple?style=flat-square&logo=debian"> -->
 
 其他发行版及类型系统如果测试通过或出现问题请提交issue！
 
