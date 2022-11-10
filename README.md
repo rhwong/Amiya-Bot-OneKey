@@ -6,7 +6,7 @@
 
 
 <img src="https://img.shields.io/github/issues/rhwong/Amiya-Bot-OneKey"> <img src="https://img.shields.io/github/forks/rhwong/Amiya-Bot-OneKey"> 
-<img src="https://img.shields.io/github/stars/rhwong/Amiya-Bot-OneKey"> <img src="https://img.shields.io/github/license/rhwong/Amiya-Bot-OneKey">
+<!--<img src="https://img.shields.io/github/stars/rhwong/Amiya-Bot-OneKey"> <img src="https://img.shields.io/github/license/rhwong/Amiya-Bot-OneKey">-->
 
 注意：本项目仅用于快速部署 [AmiyaBot](https://github.com/AmiyaBot/Amiya-Bot) 本体，后续对接何种前端(如[Go-cqhtp](https://github.com/Mrs4s/go-cqhttp/))取决您自己的选择，这些部分并不包含在部署范围内，请参考[官方教程](https://www.amiyabot.com/guide/deploy/console/configure.html)。
 
