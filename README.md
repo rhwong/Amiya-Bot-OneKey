@@ -14,10 +14,15 @@
 
 <img src="https://img.shields.io/badge/Ubuntu-x86__64-red?style=flat-square&logo=ubuntu"> 
 <img src="https://img.shields.io/badge/Ubuntu-aarch64-red?style=flat-square&logo=ubuntu"> 
-<!--<img src="https://img.shields.io/badge/CentOS-x86__64-green?style=flat-square&logo=centos"> 
-<img src="https://img.shields.io/badge/Debian-x86__64-purple?style=flat-square&logo=debian"> -->
+<!--<img src="https://img.shields.io/badge/CentOS-x86__64-green?style=flat-square&logo=centos"> -->
+<img src="https://img.shields.io/badge/Debian11-x86__64-purple?style=flat-square&logo=debian">
 
-其他发行版及类型系统如果测试通过或出现问题请提交issue！
+不支持CentOS和Debian11以下，其原因是AmiyaBot中使用的playwright所支持的Linux发行版只有Ubuntu18/20/22/Debian11，
+
+并且其中Ubuntu18将在2022年12月后停止支持，所以请各位部署时注意选择服务器系统。
+
+如果无法部署，请换用Docker的方式进行部署。
+
 
 </div>
 <!-- projectInfo end -->
