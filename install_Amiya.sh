@@ -66,15 +66,10 @@
         if [[ ${release} != "Centos" ]]; then
             echo -e "${Info} 检测到当前发行版系统为 ${Green_font_prefix}[${release}]${Font_color_suffix}..."
         else
-            echo -e "${Warrning} Amiya官方不推荐使用${Red_font_prefix}[${release}]${Font_color_suffix}进行部署，推荐您使用Docker部署!"
-            echo -e "${Warrning} 本脚本可以运行在${Red_font_prefix}[${release}]${Font_color_suffix}上，但未经验证，可能会出现未知错误。"
-            # 继续运行请按Y
-                read -p "是否继续运行？[Y/n]:" yn
-                if [[ $yn == [Yy] ]]; then
-                echo -e "${Info} 继续运行..."
-                else
-                exit 1
-                fi
+            echo -e "${Warrning} Amiya官方不推荐使用${Red_font_prefix}[${release}]${Font_color_suffix}进行部署"
+            echo -e "${Warrning} 其原因是AmiyaBot中使用的playwright工具所支持的Linux发行版只有${Green_font_prefix}Ubuntu18/20/22/Debian11${Font_color_suffix}"
+            echo -e "${Warrning} 如果您仍然想要在Centos上部署AmiyaBot，请按Ctrl+C退出安装脚本，然后使用docker部署"
+            exit 1 
         fi
 
     }
@@ -379,6 +374,44 @@
         echo -e "${Tip} 依赖安装或修复完成！"
         sleep 2
     }
+
+    check_debian()
+    {
+        if [[ ${release} == "Debian" ]]; then
+            echo -e "${Info} 检测到系统为Debian，开始安装playwright所需依赖..."
+            sleep 2
+            install_libjpeg
+            install_libicu
+            echo -e "${Tip} playwright所需依赖安装完成！"
+            sleep 2
+        fi
+    }
+
+    # 从http://archive.ubuntu.com/ubuntu/pool/main/libj/libjpeg-turbo/libjpeg-turbo8_2.0.3-0ubuntu1_amd64.deb为debian安装Libjpeg-turbo8
+    install_libjpeg()
+    {
+        echo -e "${Info} 开始安装Libjpeg-turbo8..."
+        sleep 2
+        cd $HOME
+        wget http://archive.ubuntu.com/ubuntu/pool/main/libj/libjpeg-turbo/libjpeg-turbo8_2.0.3-0ubuntu1_amd64.deb
+        dpkg -i libjpeg-turbo8_2.0.3-0ubuntu1_amd64.deb
+        rm -rf libjpeg-turbo8_2.0.3-0ubuntu1_amd64.deb
+        echo -e "${Tip} Libjpeg-turbo8安装完成！"
+        sleep 2
+    }
+    # 从http://archive.ubuntu.com/ubuntu/pool/main/i/icu/libicu66_66.1-2ubuntu2_amd64.deb为debian安装libicu66
+    install_libicu()
+    {
+        echo -e "${Info} 开始安装libicu66..."
+        sleep 2
+        cd $HOME
+        wget http://archive.ubuntu.com/ubuntu/pool/main/i/icu/libicu66_66.1-2ubuntu2_amd64.deb
+        dpkg -i libicu66_66.1-2ubuntu2_amd64.deb
+        rm -rf libicu66_66.1-2ubuntu2_amd64.deb
+        echo -e "${Tip} libicu66安装完成！"
+        sleep 2
+    }
+
 
     StartAmiya()
     {
