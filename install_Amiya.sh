@@ -443,10 +443,11 @@ Ver=v1.2.3
     StartProject()
     {
     # 启动脚本
-        echo -e "·····························"
-        echo -e "${Red_font_prefix}---${project_name}-OneKey ${Ver} by ${author}---${Font_color_suffix}"
+        echo -e "·····················································"
+        echo -e "${Red_font_prefix}---${project_name}-OneKey ${Ver} "
+        echo -e "by ${author}---${Font_color_suffix}"
         echo -e "${Tip} 开始安装${project_name}..." 
-        echo -e "·····························"
+        echo -e "·····················································"
         check_sys
         anti_os
         anti_bit
