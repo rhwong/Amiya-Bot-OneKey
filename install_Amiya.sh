@@ -17,7 +17,7 @@ conda_path=$HOME/miniconda3
 project_path=$HOME/Amiya-Bot
 project_name=Amiya-Bot
 env_name=Amiya-Bot
-main_file=main.py
+main_file=amiya.py
 py_ver=3.8
 min_py_ver=7
 max_py_ver=8
@@ -444,8 +444,7 @@ Ver=v1.2.3
     {
     # 启动脚本
         echo -e "·····················································"
-        echo -e "${Red_font_prefix}---${project_name}-OneKey ${Ver} "
-        echo -e "by ${author}---${Font_color_suffix}"
+        echo -e "${Red_font_prefix}---${project_name}-OneKey ${Ver} by ${author}---${Font_color_suffix}"
         echo -e "${Tip} 开始安装${project_name}..." 
         echo -e "·····················································"
         check_sys
