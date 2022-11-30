@@ -1,19 +1,29 @@
-    #!/bin/bash
+#!/bin/bash
 
-    # =================================================
-    #	Description: Amiya-Bot-OneKey
-    #	Version: 1.1.0
-    #	Author: RHWong
-    # =================================================
+# =================================================
+#	Description: Amiya-Bot-OneKey
+#	Version: 1.2.3
+#	Author: RHWong
+# =================================================
 
-    Green_font_prefix="\033[32m" && Red_font_prefix="\033[31m" && Green_background_prefix="\033[42;37m" && Red_background_prefix="\033[41;37m" && Font_color_suffix="\033[0m"
-    Info="${Green_font_prefix}[信息]${Font_color_suffix}"
-    Error="${Red_font_prefix}[错误]${Font_color_suffix}"
-    Warrning="${Red_font_prefix}[警告]${Font_color_suffix}"
-    Tip="${Green_font_prefix}[提示]${Font_color_suffix}"
-    ret_code=`curl -o /dev/null --connect-timeout 3 -s -w %{http_code} https://google.com`
-    conda_path=$HOME/miniconda3
-    # 如果ret_code变量值是200或者301
+author="Amiya-Bot-Team RHWong"
+Green_font_prefix="\033[32m" && Red_font_prefix="\033[31m" && Green_background_prefix="\033[42;37m" && Red_background_prefix="\033[41;37m" && Font_color_suffix="\033[0m"
+Info="${Green_font_prefix}[信息]${Font_color_suffix}"
+Error="${Red_font_prefix}[错误]${Font_color_suffix}"
+Warrning="${Red_font_prefix}[警告]${Font_color_suffix}"
+Tip="${Green_font_prefix}[提示]${Font_color_suffix}"
+ret_code=`curl -o /dev/null --connect-timeout 3 -s -w %{http_code} https://google.com`
+conda_path=$HOME/miniconda3
+project_path=$HOME/Amiya-Bot
+project_name=Amiya-Bot
+env_name=Amiya-Bot
+main_file=main.py
+py_ver=3.8
+min_py_ver=7
+max_py_ver=8
+Ver=v1.2.3
+
+    # 根据网络选择miniconda3镜像源
     if [ $ret_code -eq 200 ] || [ $ret_code -eq 301 ]; then
         miniconda_url=https://repo.anaconda.com/miniconda
     else
@@ -21,24 +31,7 @@
     fi
             
 
-
-
-    function waiting()
-    {
-        i=0
-        while [ $i -le 100 ]
-        do
-        for j in '\\' '|' '/' '-'
-        do
-        printf "\t%c%c%c%c%c ${Info} 兔兔祈祷中... %c%c%c%c%c\r" \
-        "$j" "$j" "$j" "$j" "$j" "$j" "$j" "$j" "$j" "$j"
-        sleep 0.1
-        done
-        let i=i+4
-        done
-    }
-
-    # 检测本机是否为Centos
+    # 检测本机内核发行版
     check_sys(){
         if [[ -f /etc/redhat-release ]]; then
             release="Centos"
@@ -54,6 +47,9 @@
             release="Ubuntu"
         elif cat /proc/version | grep -q -E -i "Centos|red hat|redhat"; then
             release="Centos"
+        # 如果是termux
+        elif [ -f /data/data/com.termux/files/usr/bin/bash ]; then
+            release="Termux"
         # 如果是未知系统版本则输出unknown
         else
             release="unknown"
@@ -61,25 +57,39 @@
         bit=`uname -m`
     }
 
-    # 如果是Centos则返回警告
-    anti_Centos(){
-        if [[ ${release} != "Centos" ]]; then
-            echo -e "${Info} 检测到当前发行版系统为 ${Green_font_prefix}[${release}]${Font_color_suffix}..."
+    # 出于对剧作家模块的支持考虑，如果是Centos~/Debian11↓/Ubuntu18↓则返回警告
+    anti_os(){
+        if [[ ${release} == "Centos" ]]; then
+                    echo -e "${Warrning} playwright不支持Centos全部版本，请升级系统后再运行本脚本！"
+                    exit 1
+        elif [[ ${release} == "Debian" ]]; then
+            if [[ `cat /etc/issue | grep -oE  "[0-9.]+" | cut -d \. -f1` -lt 11 ]]; then
+                echo -e "${Warrning} playwright不支持Debian10及以下版本，请升级系统后再运行本脚本！"
+                exit 1
+            else
+                echo -e "${Info} 系统检查通过！"
+            fi
+        elif [[ ${release} == "Ubuntu" ]]; then
+            if [[ `cat /etc/issue | grep -oE  "[0-9.]+" | cut -d \. -f1` -lt 18 ]]; then
+                echo -e "${Warrning} playwright不支持Ubuntu16及以下版本，请升级系统后再运行本脚本！"
+                exit 1
+            else
+                echo -e "${Info} 系统检查通过！"
+            fi
+        elif [[ ${release} == "Termux" ]]; then
+            echo -e "${Info} 注意：Termux仅支持本地安装，不支持conda环境！"
         else
-            echo -e "${Warrning} Amiya官方不推荐使用${Red_font_prefix}[${release}]${Font_color_suffix}进行部署"
-            echo -e "${Warrning} 其原因是AmiyaBot中使用的playwright工具所支持的Linux发行版只有${Green_font_prefix}Ubuntu18/20/22/Debian11${Font_color_suffix}"
-            echo -e "${Warrning} 如果您仍然想要在Centos上部署AmiyaBot，请按Ctrl+C退出安装脚本，然后使用docker部署"
-            exit 1 
+            echo -e "${Warrning} playwright仅支持Debian11↑/Ubuntu18↑，请更换系统后再运行本脚本！"
+            exit 1
         fi
-
     }
 
     # 如果不是x86_64则返回警告
     anti_bit(){
         if [[ ${bit} == "x86_64" ]]; then
-            echo -e "${Info} 系统类型为 ${Green_font_prefix}[${bit}]${Font_color_suffix}，开始安装..."
+            print_release_bit
         else
-            echo -e "${Warrning} Amiya官方不推荐使用${Red_font_prefix}[${bit}]${Font_color_suffix}进行部署!"
+            echo -e "${Warrning} ${project_name}官方不推荐使用${Red_font_prefix}[${bit}]${Font_color_suffix}进行部署!"
             echo -e "${Warrning} 本脚本可以运行在${Red_font_prefix}[${bit}]${Font_color_suffix}上，但未经验证，可能会出现未知错误。"
             # 继续运行请按Y
                 read -p "是否继续运行？[Y/n]:" yn
@@ -103,7 +113,7 @@
             apt update
             apt install -y wget git
         elif [[ ${release} == "unknown" ]]; then
-            echo -e "${Error} 未知系统版本，若无法继续运行请自行安装wget和git"
+            echo -e "${Warrning} 未知系统版本，若无法继续运行请自行安装wget和git"
             sleep 3
         fi
     }
@@ -111,81 +121,16 @@
     # 打印release和bit
         # 如果是Centos则返回警告
     print_release_bit(){
-        if [[ ${release} != "Centos" ]]; then
             echo -e "${Info} 当前系统为 ${Green_font_prefix}[${release}]${Font_color_suffix} ${Green_font_prefix}[${bit}]${Font_color_suffix}"
-        else
-            echo -e "${Info} 当前系统为 ${Green_font_prefix}[${release}]${Font_color_suffix} ${Green_font_prefix}[${bit}]${Font_color_suffix}"
-            echo -e "${Warrning} Amiya官方不推荐使用${Red_font_prefix}[${release}]${Font_color_suffix}进行部署，推荐您使用Docker部署!"
-            echo -e "${Warrning} 本脚本可以运行在${Red_font_prefix}[${release}]${Font_color_suffix}上，但未经验证，可能会出现未知错误。"
-            sleep 5
-        fi
-
     }
-
-    # 静默安装conda
-    silent_install_conda(){
-        # conda命令可用，跳过安装
-        if [ -x "$(command -v conda)" ]; then
-            echo -e "${Info} 检测到已存在conda，跳过安装"
-            sleep 2
-        else
-            echo -e "${Info} 检测到未安装conda，开始安装"
-            # 删除conda目录
-            if [ -d "$conda_path" ]; then
-                echo -e "${Info} 检测到已存在conda目录，正在删除..."
-                rm -rf $conda_path
-            fi
-            echo -e "${Warrning} 注意，安装中如果提示需要你点击enter键或输入yes，请按照屏幕上的提示输入！"
-            echo -e "${Warrning} 安装conda完毕后，请重新连接终端并切换到amiya环境后重新运行此脚本。"
-            sleep 4
-        # conda安装
-            # 下载安装包
-                if [[ ${bit} == "x86_64" ]]; then
-                    wget ${miniconda_url}/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-                elif [[ ${bit} == "aarch64" ]]; then
-                    wget ${miniconda_url}/Miniconda3-latest-Linux-aarch64.sh -O miniconda.sh
-                elif [[ ${bit} == "armv7l" ]]; then
-                    wget ${miniconda_url}/Miniconda3-latest-Linux-armv7l.sh -O miniconda.sh
-                elif [[ ${bit} == "i686" ]]; then
-                    wget ${miniconda_url}/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
-                elif [[ ${bit} == "ppc64le" ]]; then
-                    wget ${miniconda_url}/Miniconda3-latest-Linux-ppc64le.sh -O miniconda.sh
-                elif [[ ${bit} == "s390x" ]]; then
-                    wget ${miniconda_url}/Miniconda3-latest-Linux-s390x.sh -O miniconda.sh
-                elif [[ ${bit} == "i386" ]]; then
-                    wget ${miniconda_url}/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
-                else
-                    echo -e "${Error} 本脚本不支持${Red_font_prefix}[${bit}]${Font_color_suffix}系统！"
-                    exit 1
-                fi
-            bash miniconda.sh -b
-            echo -e "${Info} conda安装结束！"
-            sleep 2
-        add_conda_path
-        source /etc/profile
-        check_conda_install
-        fi
-    }
-
 
     # 安装conda
     check_conda(){
-        # conda命令可用，跳过安装
-        if [ -x "$(command -v conda)" ]; then
-            echo -e "${Info} 检测到已存在conda，跳过安装"
+        if [ -d "${conda_path}" ]; then
+            echo -e "${Info} 检测到已存在conda目录，跳过安装，如果需要重新安装，请先删除conda目录！"
             sleep 2
         else
             echo -e "${Info} 检测到未安装conda，开始安装"
-            # 删除conda目录
-            if [ -d "$conda_path" ]; then
-                echo -e "${Info} 检测到已存在conda目录，正在删除..."
-                rm -rf $conda_path
-            fi
-            echo -e "${Warrning} 注意，安装中如果提示需要你点击enter键或输入yes，请按照屏幕上的提示输入！"
-            echo -e "${Warrning} 安装conda完毕后，请重新连接终端并切换到amiya环境后重新运行此脚本。"
-            sleep 2
-            # 按下enter继续
-            read -p "确认阅读上述说明后，按下enter键继续..."
         # conda安装
             # 下载安装包
                 if [[ ${bit} == "x86_64" ]]; then
@@ -203,70 +148,59 @@
                 elif [[ ${bit} == "i386" ]]; then
                     wget ${miniconda_url}/Miniconda3-latest-Linux-x86.sh -O miniconda.sh
                 else
-                    echo -e "${Error} 本脚本不支持${Red_font_prefix}[${bit}]${Font_color_suffix}系统！"
+                    echo -e "${Error} miniconda不支持${Red_font_prefix}[${bit}]${Font_color_suffix}系统！"
                     exit 1
                 fi
             bash miniconda.sh -b
             echo -e "${Info} conda安装结束！"
             sleep 2
-        add_conda_path
-        source /etc/profile
         check_conda_install
         fi
     }
 
     # 检测conda安装是否成功
     check_conda_install(){
-        if [ -x "$(command -v conda)" ]; then
+        if [ -n "$(${conda_path}/bin/conda -V)" ]; then
             echo -e "${Info} conda安装成功！"
             sleep 2
         else
-            echo -e "${Error} conda安装失败，请手动安装conda"
+            echo -e "${Error} conda安装失败，请检查日志输出！"
             exit 1
         fi
     }
 
-    # 将conda加入环境变量
-    add_conda_path(){
-        echo -e "${Tip} 正在将conda加入环境变量..."
-        echo "export PATH=$conda_path/bin:$PATH" >> /etc/profile
-        source /etc/profile
-        echo -e "${Info} conda加入环境变量完成！"
-    }
-
     create_conda_env(){
-        # 判断Amiya环境是否已经存在
-        if [ -d "$conda_path/envs/Amiya" ]; then
-            echo -e "${Info} Amiya环境已存在，跳过部署！"
+        # 判断项目环境是否已经存在
+        if [ -d "${conda_path}/envs/${env_name}" ]; then
+            echo -e "${Info} ${env_name}环境已存在，跳过部署！"
             sleep 2
         else
-            echo -e "${Info} Amiya环境不存在，开始部署..."
+            echo -e "${Info} ${env_name}环境不存在，开始部署..."
             sleep 2
-            conda init bash
-            echo y | conda create -n Amiya python=3.8
-            conda activate Amiya
-            echo -e "${Info} Amiya环境部署完成！请${Red_font_prefix}重新连接${Font_color_suffix}到终端，使用${Green_font_prefix}conda activate Amiya${Font_color_suffix}指令来激活Amiya环境，然后${Red_font_prefix}重新运行${Font_color_suffix}此脚本。"
-            exit 1
+            echo y | ${conda_path}/bin/conda create -n ${env_name} python=${py_ver}
+            ${conda_path}/bin/conda activate ${env_name}
+            echo -e "${Info} ${env_name}环境部署完成！"
         fi
     }
 
     # 检测本地python版本
     check_python()
     {
-        local python_version=`python3 -V 2>&1 | awk '{print $2}'`
-        # 如果版本大于3.7，小于3.8
-        if [ "$python_version" \> "3.7.0" ] && [ "$python_version" \< "3.8.99" ]; then
-            echo -e "${Info} 本地python版本为$python_version，符合要求！"
+        local py_v_1=`python -V 2>&1|awk '{print $2}'|awk -F '.' '{print $1}'`
+        local py_v_2=`python -V 2>&1|awk '{print $2}'|awk -F '.' '{print $2}'`
+        local python_version=`python -V 2>&1 | awk '{print $2}'`
+        # 如果版本大于等于3.8，小于等于3.10
+        if [[ ${py_v_1} -eq 3 && ${py_v_2} -ge ${min_py_ver} && ${py_v_2} -le ${max_py_ver} ]]; then
+            echo -e "${Info} 检测到本地python版本为${Green_font_prefix}[${python_version}]${Font_color_suffix}，符合要求！"
             sleep 2
-        else
-        # 如果版本小于3.7，大于3.9
-            if [ "$python_version" \< "3.6.99" ]; then
-                echo -e "${Error} 本地python版本为$python_version，版本过低不符合要求！"
-                echo -e "${Tip} 请手动安装python3.7或python3.8，或重新运行脚本安装conda"
-                exit 1
-        # 如果版本大于3.9
-            elif [ "$python_version" \> "3.9.0" ]; then
-                echo -e "${Warrning} 本地python版本为$python_version，大于3.8可能会出现依赖版本不支持的情况！"
+        # 如果版本小于3.8
+        elif [[ ${py_v_1} -eq 3 && ${py_v_2} -lt ${min_py_ver} ]]; then
+            echo -e "${Error} 检测到本地python版本为${Red_font_prefix}[${python_version}]${Font_color_suffix}，小于3.${min_py_ver}，不符合要求！"
+            exit 1  
+        # 如果版本大于3.10
+        elif [[ ${py_v_1} -eq 3 && ${py_v_2} -gt ${max_py_ver} ]]; then
+            echo -e "${Error} 检测到本地python版本为${Red_font_prefix}[${python_version}]${Font_color_suffix}"
+            echo -e "${Tip} ${project_name}目前仅支持python3.${min_py_ver}-3.${max_py_ver}，如果你的python版本大于3.${max_py_ver}，可能会出现未知错误！"
                 # 询问是否继续，输入y继续，输入n退出
                 read -p "是否继续？[y/n]:" yn
                 if [[ $yn == [Yy] ]]; then
@@ -275,12 +209,16 @@
                 echo -e "${Info} 退出运行！"
                 exit 1
                 fi
-            else
+        # 如果安装的是python2
+        elif [[ ${py_v_1} -eq 2 ]]; then
+            echo -e "${Error} 检测到本地python版本为${Red_font_prefix}[${python_version}]${Font_color_suffix}，你的战术是现代的,构思却相当古老。你究竟是什么人？！"
+            exit 1
+        else
             # 没有python
                 echo -e "${Error} 本地没有安装python！"
-                echo -e "${Tip} 请先手动安装python3.7或python3.8，或重新运行脚本使用conda安装"
+                echo -e "${Tip} 请先手动安装python3.${min_py_ver}~3.${max_py_ver}，或重新运行脚本使用conda安装"
                 exit 1
-            fi
+            
         fi
     }
 
@@ -322,103 +260,195 @@
             fi
         fi
     }
-
-    # 安装兔兔
-    install_Amiya()
+    # 安装项目
+    install_project()
     {
         cd $HOME
-        # 判断Amiya-Bot目录下amiya.py是否存在  
-    if [ ! -f "Amiya-Bot/amiya.py" ]; then
-        echo -e "${Info} Amiya-Bot主文件不存在，开始安装..."
+        # 判断项目目录下主要程序是否存在  
+    if [ ! -f "${project_name}/${main_file}" ]; then
+        echo -e "${Info} ${project_name}主文件不存在，开始安装..."
         sleep 2
         # 如果ret_code变量值是200
-        if [ $ret_code -eq 200 ] || [ $ret_code -eq 301 ]; then
-            echo -e "${Info} 网络连接正常，开始下载Amiya-Bot..."
-            git clone https://github.com/AmiyaBot/Amiya-Bot.git & waiting
+        if [ $ret_code -eq 200]; then
+            echo -e "${Info} 网络连接正常，开始下载${project_name}..."
+            git clone https://github.com/AmiyaBot/Amiya-Bot.git
         else 
         # 如果ret_code变量值不是200，使用镜像下载
-            echo -e "${Info} 网络连接异常，开始使用镜像下载Amiya-Bot..."
-            git clone https://ghproxy.com/https://github.com/AmiyaBot/Amiya-Bot.git & waiting
+            echo -e "${Info} 网络连接异常，开始使用镜像下载${project_name}..."
+            git clone https://ghproxy.com/https://github.com/AmiyaBot/Amiya-Bot.git
         fi
-        echo -e "${Tip} Amiya-Bot下载完成！"
+        echo -e "${Tip} ${project_name}下载完成！"
         sleep 2
     else
-        echo -e "${Info} Amiya-Bot文件已存在，无需安装！"
+        echo -e "${Info} ${project_name}文件已存在，无需安装！"
         sleep 2
-        # 更新Amiya-Bot
-        echo -e "${Tip} 正在更新Amiya-Bot..."
+        # 更新项目文件
+        echo -e "${Tip} 正在更新${project_name}..."
         sleep 2
-        git pull & waiting
-        echo -e "${Tip} Amiya-Bot更新完成！"
+        git pull
+        echo -e "${Tip} ${project_name}更新完成！"
         sleep 2
     fi
     }
+
 
     # 安装或修复依赖
     install_dependence()
     {
         echo -e "${Info} 开始安装或修复依赖..."
         sleep 2
-        cd $HOME/Amiya-Bot
-        if [ $ret_code -eq 200 ] || [ $ret_code -eq 301 ]; then
+        local py_v_2=`python -V 2>&1|awk '{print $2}'|awk -F '.' '{print $2}'`
+        cd ${project_path}
+        if [ $ret_code -eq 200 ]; then
             echo -e "${Info} 网络连通性良好，使用默认镜像下载"
             pip3 install --upgrade pip
-            pip install pyyaml~=6.0 --ignore-installed
-            pip3 install --upgrade pip -r requirements.txt
         else
             echo -e "${Info} 网络连通性不佳，使用腾讯镜像下载"
             pip3 install --upgrade pip -i https://mirrors.cloud.tencent.com/pypi/simple/
-            pip install pyyaml~=6.0 --ignore-installed -i https://mirrors.cloud.tencent.com/pypi/simple
-            pip3 install --upgrade pip -r requirements.txt -i https://mirrors.cloud.tencent.com/pypi/simple
         fi
+        # 搜索目录下的所有requirements.txt文件并逐个安装
+        for file in $(find . -name "requirements.txt")
+        do
+            if [ $ret_code -eq 200 ]; then
+                echo -e "${Info} 正在安装${file}中的依赖..."
+                sleep 1
+                # 如果python版本大于3.10
+                # if [ $py_v_2 -gt 10 ]; then
+                #     pip3 install --upgrade pip -r requirements310.txt
+                # else
+                    pip3 install --upgrade pip -r ${file}
+                # fi
+                echo -e "${Tip} ${file}中的依赖安装完成！"
+                sleep 1
+            else
+                echo -e "${Info} 正在安装${file}中的依赖..."
+                sleep 1
+                # 如果python版本大于3.10
+                # if [ $py_v_2 -gt 10 ]; then
+                #     pip3 install --upgrade pip -r requirements310.txt -i https://mirrors.cloud.tencent.com/pypi/simple/
+                # else
+                    pip3 install --upgrade pip -r ${file} -i https://mirrors.cloud.tencent.com/pypi/simple/
+                # fi
+                echo -e "${Tip} ${file}中的依赖安装完成！"
+                sleep 1
+            fi
+        done
+        echo -e "${Tip} 所有依赖安装或修复完成！"
+        sleep 2
+        }
+
+    # 为conda环境安装或修复依赖
+    install_conda_dependence()
+    {
+        echo -e "${Info} 开始安装或修复依赖..."
+        sleep 2
+        cd ${project_path}
+        if [ $ret_code -eq 200 ]; then
+            echo -e "${Info} 网络连通性良好，使用默认镜像下载"
+            ${conda_path}/envs/${env_name}/bin/pip3 install --upgrade pip
+        else
+            echo -e "${Info} 网络连通性不佳，使用腾讯镜像下载"
+            ${conda_path}/envs/${env_name}/bin/pip3 install --upgrade pip -i https://mirrors.cloud.tencent.com/pypi/simple/
+        fi
+         # 搜索目录下的所有requirements.txt文件并逐个安装
+        for file in $(find . -name "requirements.txt")
+        do
+            if [ $ret_code -eq 200 ]; then
+                echo -e "${Info} 正在安装${file}中的依赖..."
+                sleep 1
+                ${conda_path}/envs/${env_name}/bin/pip3 install --upgrade pip -r $file
+                echo -e "${Tip} ${file}中的依赖安装完成！"
+                sleep 1
+            else
+                echo -e "${Info} 正在安装${file}中的依赖..."
+                sleep 1
+                ${conda_path}/envs/${env_name}/bin/pip3 install --upgrade pip -r $file -i https://mirrors.cloud.tencent.com/pypi/simple
+                echo -e "${Tip} ${file}中的依赖安装完成！"
+                sleep 1
+            fi
+        done
         echo -e "${Tip} 依赖安装或修复完成！"
         sleep 2
     }
 
-    check_debian()
-    {
-        if [[ ${release} == "Debian" ]]; then
-            echo -e "${Info} 检测到系统为Debian，开始安装playwright所需依赖..."
-            sleep 2
-            install_libjpeg
-            install_libicu
-            echo -e "${Tip} playwright所需依赖安装完成！"
-            sleep 2
+
+    # 删除miniconda
+    remove_miniconda(){
+        if [ -d "${conda_path}" ]; then
+            # 提示是否删除conda
+            echo -e "${Tip} 是否删除miniconda？"
+            # 继续运行请按Y
+            read -p "是否继续运行？[Y/n]" confirm
+            if [ $confirm == "Y" ] || [ $confirm == "y" ]; then
+                echo -e "${Info} 开始删除miniconda..."
+                sleep 2
+                rm -rf ${conda_path}
+                echo -e "${Tip} miniconda删除成功！"
+                sleep 2
+                # 检测是否删除成功
+                if [ -d "${conda_path}" ]; then
+                    echo -e "${Error} 删除失败！"
+                    exit 1
+                else
+                    echo -e "${Tip} 删除成功！"
+                fi
+            else
+                echo -e "${Tip} 取消删除miniconda！"
+                sleep 2
+            fi
+        # 未找到目录
+        else
+            echo -e "${Info} 未检测到conda目录"
         fi
     }
 
-    # 从http://archive.ubuntu.com/ubuntu/pool/main/libj/libjpeg-turbo/libjpeg-turbo8_2.0.3-0ubuntu1_amd64.deb为debian安装Libjpeg-turbo8
-    install_libjpeg()
-    {
-        echo -e "${Info} 开始安装Libjpeg-turbo8..."
-        sleep 2
-        cd $HOME
-        wget http://archive.ubuntu.com/ubuntu/pool/main/libj/libjpeg-turbo/libjpeg-turbo8_2.0.3-0ubuntu1_amd64.deb
-        dpkg -i libjpeg-turbo8_2.0.3-0ubuntu1_amd64.deb
-        rm -rf libjpeg-turbo8_2.0.3-0ubuntu1_amd64.deb
-        echo -e "${Tip} Libjpeg-turbo8安装完成！"
-        sleep 2
+    # 删除项目
+    remove_project(){
+        # 警告
+        echo -e "${Warrning} 卸载${project_name}会${Red_font_prefix}完全删除${Font_color_suffix}所有数据，且${Red_font_prefix}无法恢复${Font_color_suffix}！"
+        echo -e "${Warrning} 请确保你已经备份好需要保留的数据！"
+        # 继续运行请按Y
+            read -p "是否继续运行？[Y/n]:" yn
+            if [[ $yn == [Yy] ]]; then
+            echo -e "${Info} 继续运行..."
+            else
+            exit 1
+            fi
+        if [ -d "${project_path}" ]; then
+            echo -e "${Info} 检测到已存在${project_name}目录，正在删除..."
+            rm -rf ${project_path}
+        # 未找到目录
+        else
+            echo -e "${Info} 未检测到${project_name}目录"
+        fi
+        # 检测是否删除成功
+        if [ -d "${project_path}" ]; then
+            echo -e "${Error} 删除失败！"
+            exit 1
+        else
+            echo -e "${Tip} 删除成功！"
+        fi
     }
-    # 从http://archive.ubuntu.com/ubuntu/pool/main/i/icu/libicu66_66.1-2ubuntu2_amd64.deb为debian安装libicu66
-    install_libicu()
-    {
-        echo -e "${Info} 开始安装libicu66..."
+
+    # 卸载
+    uninstall(){
+        echo -e "${Info} 开始卸载..."
         sleep 2
-        cd $HOME
-        wget http://archive.ubuntu.com/ubuntu/pool/main/i/icu/libicu66_66.1-2ubuntu2_amd64.deb
-        dpkg -i libicu66_66.1-2ubuntu2_amd64.deb
-        rm -rf libicu66_66.1-2ubuntu2_amd64.deb
-        echo -e "${Tip} libicu66安装完成！"
+        remove_miniconda
+        remove_project
+        echo -e "${Tip} 卸载完成！"
         sleep 2
     }
 
-
-    StartAmiya()
+    StartProject()
     {
-    # 启动Amiya
-        echo -e "${Tip} 开始安装Amiya-Bot..." 
+    # 启动脚本
+        echo -e "·····························"
+        echo -e "${Red_font_prefix}---${project_name}-OneKey ${Ver} by ${author}---${Font_color_suffix}"
+        echo -e "${Tip} 开始安装${project_name}..." 
+        echo -e "·····························"
         check_sys
-        anti_Centos
+        anti_os
         anti_bit
         select_install
     }
@@ -428,19 +458,21 @@
         install_wget_git
         check_python
         check_pip
-        install_Amiya
-        chmod -R 766 $HOME/Amiya-Bot
-        cd $HOME/Amiya-Bot
+        install_project
+        chmod -R 766 ${project_path}
+        cd ${project_path}
         install_dependence
-        echo -e "${Tip} Amiya-Bot安装完成！"
+        echo -e "${Tip} ${project_name}安装完成！"
         sleep 2
         echo -e "${Tip} 开始尝试运行，如有问题请提交issue"
-        python3 amiya.py
+        cd ${project_path} && python3 ${main_file}
         # 打印安装位置
-        echo -e "${Tip} Amiya-Bot安装位置：$HOME/Amiya-Bot"
-        # 打印Amiya启动指令
+        echo -e "${Tip} ${project_name}安装位置：${project_path}"
+        # 打印启动指令
         echo -e "启动指令如下："
-        echo -e "${Green_font_prefix}cd $HOME/Amiya-Bot && python3 amiya.py${Font_color_suffix}"
+        echo -e "${Green_font_prefix}cd ${project_path} && python3 ${main_file}${Font_color_suffix}"
+        echo -e "如果需要后台运行，请使用:"
+        echo -e "${Green_font_prefix}cd ${project_path} && screen -dmS ${project_name} python3 ${main_file}${Font_color_suffix}"
     }
 
     # conda安装
@@ -448,53 +480,56 @@
         install_wget_git
         check_conda
         create_conda_env
-        echo -e "${Tip} 正在安装Amiya-Bot..."
+        echo -e "${Tip} 正在安装${project_name}..."
         sleep 2
-        install_Amiya
-        chmod -R 766 $HOME/Amiya-Bot
-        cd $HOME/Amiya-Bot
-        install_dependence
-        echo -e "${Tip} Amiya-Bot安装完成！"
+        install_project
+        chmod -R 766 ${project_path}
+        install_conda_dependence
+        echo -e "${Tip} ${project_name}安装完成！"
         sleep 2
         echo -e "${Tip} 开始尝试运行，如有问题请提交issue"
-        python3 amiya.py
+        cd ${project_path} && ${conda_path}/envs/${env_name}/bin/python3 ${main_file}
         # 打印安装位置
-        echo -e "${Tip} Amiya-Bot安装位置：$HOME/Amiya-Bot"
-    #    打印Amiya启动指令
+        echo -e "${Tip} ${project_name}安装位置：${project_path}"
+    #    打印启动指令
         echo -e "启动指令如下："
-        echo -e "${Green_font_prefix}cd $HOME/Amiya-Bot && conda activate Amiya && python3 amiya.py${Font_color_suffix}"
+        echo -e "${Green_font_prefix}cd ${project_path} && ${conda_path}/envs/${env_name}/bin/python3 ${main_file}${Font_color_suffix}"
+        echo -e "如果需要后台运行，请使用:"
+        echo -e "${Green_font_prefix}cd ${project_path} && screen -dmS ${project_name} ${conda_path}/envs/${env_name}/bin/python3 ${main_file}${Font_color_suffix}"
     }
+
 
     # 静默conda安装
     silent_start(){
         check_sys
         print_release_bit
         install_wget_git
-        silent_install_conda
+        check_conda
         create_conda_env
-        echo -e "${Tip} 正在安装Amiya-Bot..."
+        echo -e "${Tip} 正在安装${project_name}..."
         sleep 2
-        install_Amiya
-        chmod -R 766 $HOME/Amiya-Bot
-        cd $HOME/Amiya-Bot
-        install_dependence
-        echo -e "${Tip} Amiya-Bot安装完成！"
+        install_project
+        chmod -R 766 ${project_path}
+        install_conda_dependence
+        echo -e "${Tip} ${project_name}安装完成！"
         sleep 2
         echo -e "${Tip} 开始尝试运行，如有问题请提交issue"
-        python3 amiya.py
+        cd ${project_path} && ${conda_path}/envs/${env_name}/bin/python3 ${main_file}
         # 打印安装位置
-        echo -e "${Tip} Amiya-Bot安装位置：$HOME/Amiya-Bot"
-    #    打印Amiya启动指令
+        echo -e "${Tip} ${project_name}安装位置：${project_path}"
+    #    打印启动指令
         echo -e "启动指令如下："
-        echo -e "${Green_font_prefix}cd $HOME/Amiya-Bot && conda activate Amiya && python3 amiya.py${Font_color_suffix}"
+        echo -e "${Green_font_prefix}cd ${project_path} && ${conda_path}/envs/${env_name}/bin/python3 ${main_file}${Font_color_suffix}"
+        echo -e "如果需要后台运行，请使用:"
+        echo -e "${Green_font_prefix}cd ${project_path} && screen -dmS ${project_name} ${conda_path}/envs/${env_name}/bin/python3 ${main_file}${Font_color_suffix}"
     }
-
 
     # 提示选择在本地安装还是在conda安装
     select_install(){
         echo -e "${Info} 请选择安装方式"
         echo -e "1. conda虚拟环境安装(推荐)"
         echo -e "2. 本地安装"
+        echo -e "3. 卸载"
         read -p "请输入数字:" num
         case "$num" in
             1)
@@ -503,18 +538,18 @@
             2)
             install_local
             ;;
+            3)
+            uninstall
+            ;;
             *)
             echo -e "${Error} 请输入正确的数字"
             exit 1
             ;;
         esac
     }
-
-
-
-# 判断脚本运行时是否包含-s参数，如果有则跳过确认步骤
+    # 判断脚本运行时是否包含-s参数，如果有则跳过确认步骤
     if [[ $1 == "-s" ]]; then
         silent_start
     else
-        StartAmiya
+        StartProject
     fi
