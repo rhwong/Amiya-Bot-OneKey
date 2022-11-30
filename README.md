@@ -38,35 +38,18 @@ wget -N https://ghproxy.com/https://github.com/rhwong/Amiya-Bot-OneKey/raw/main/
 
 使用 `-s` 参数可以跳过所有确认步骤使用conda安装方式安装。
 
-#### 【注意事项】
-
-由于conda在加入环境变量后，脚本会退出运行。此时必须重新连接到终端以生效，此时请务必断开ssh，重新连接终端。
-
-重新连接后提示符前面出现 `(base)` ，例如 `(base) root@ecs:~# ` 这样的显示就是conda成功安装了。
-
-在成功安装conda之后，我们需要重新运行一次脚本：
-
-```shell
-conda activate Amiya
-./install_Amiya.sh
-```
-
-键入 `conda activate Amiya` 用于激活Conda中刚刚创建的Amiya环境，键入 `./install_Amiya.sh` 用于重新运行脚本以继续安装。
-
 ### 启动
 
-依次输入如下指令来启动Amiya-Bot，此后也如此。
+#### Conda 安装时
 
-```shell
-conda activate Amiya
-cd $HOME/Amiya-Bot
-python3 amiya.py
 ```
-确认调试无误后可以用screen后台运行，没有screen请自行安装，Ubuntu使用 `sudo apt-get -y install screen` CentOS使用`yum -y install screen`。
+# 前台运行
+cd $HOME/Amiya-Bot && $HOME/miniconda3/envs/Amiya-Bot/bin/python3 amiya.py
+# Screen 后台运行
+screen -dmS Amiya-Bot cd $HOME/Amiya-Bot && $HOME/miniconda3/envs/Amiya-Bot/bin/python3 amiya.py
+```
+没有screen请自行安装，Ubuntu使用 `sudo apt-get -y install screen` CentOS使用`yum -y install screen`。
 
-```shell
-screen -dmS Amiya conda activate Amiya && cd $HOME/Amiya-Bot && python3 amiya.py
-```
 使用以下命令可以恢复screen窗口
 
 ```shell
