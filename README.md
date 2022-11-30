@@ -48,6 +48,14 @@ cd $HOME/Amiya-Bot && $HOME/miniconda3/envs/Amiya-Bot/bin/python3 amiya.py
 # Screen 后台运行
 screen -dmS Amiya-Bot cd $HOME/Amiya-Bot && $HOME/miniconda3/envs/Amiya-Bot/bin/python3 amiya.py
 ```
+#### 本地安装时
+```
+# 前台运行
+cd $HOME/Amiya-Bot && python3 amiya.py
+# Screen 后台运行
+screen -dmS Amiya-Bot cd $HOME/Amiya-Bot && python3 amiya.py
+```
+
 没有screen请自行安装，Ubuntu使用 `sudo apt-get -y install screen` CentOS使用`yum -y install screen`。
 
 使用以下命令可以恢复screen窗口
